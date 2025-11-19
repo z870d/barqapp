@@ -1,0 +1,74 @@
+// ==========================
+// Datasource & Generator
+// ==========================
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// ==========================
+// Models
+// ==========================
+
+// ---------- Roles ----------
+model Role {
+  id              Int              @id @default(autoincrement())
+  name            String
+  users           User[]
+  rolePermissions RolePermission[]
+  created_at      DateTime         @default(now())
+}
+
+// ---------- Permissions ----------
+model Permission {
+  id              Int              @id @default(autoincrement())
+  action          String
+  rolePermissions RolePermission[]
+  created_at      DateTime         @default(now())
+}
+
+// ---------- Role ↔ Permissions (Pivot Table) ----------
+model RolePermission {
+  role_id       Int
+  permission_id Int
+
+  role       Role       @relation(fields: [role_id], references: [id])
+  permission Permission @relation(fields: [permission_id], references: [id])
+
+  created_at DateTime @default(now())
+
+  @@id([role_id, permission_id])
+}
+
+// ---------- Users ----------
+model User {
+  id       Int    @id @default(autoincrement())
+  username String
+  role_id  Int
+  role     Role   @relation(fields: [role_id], references: [id])
+
+  // Back-relations
+  makerRequests   Request[] @relation("Maker") // requests created by user
+  shackerRequests Request[] @relation("Shacker") // requests assigned to this user as shacker
+
+  created_at DateTime @default(now())
+}
+
+// ---------- Requests ----------
+model Request {
+  id         Int      @id @default(autoincrement())
+  maker_id   Int
+  shacker_id Int?
+  field      String
+  status     String
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  maker   User  @relation("Maker", fields: [maker_id], references: [id])
+  shacker User? @relation("Shacker", fields: [shacker_id], references: [id])
+}
