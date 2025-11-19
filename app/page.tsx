@@ -1,5 +1,4 @@
 "use client"
-import Link from "next/link"
 
 import * as React from "react"
 import Image from "next/image"
@@ -7,17 +6,22 @@ import {
   EyeIcon,
   EyeOffIcon,
   LanguagesIcon,
-  LockIcon,
   User2Icon,
 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
-import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { loginAction, type LoginState } from "@/actions/login"
+
+const initialState: LoginState = { error: "" }
 
 export default function Home() {
   const [showPassword, setShowPassword] = React.useState(false)
+  const [state, formAction, pending] = React.useActionState<
+    LoginState,
+    FormData
+  >(loginAction, initialState)
 
   return (
     <main className="min-h-screen bg-[#d7d8da]">
@@ -65,7 +69,7 @@ export default function Home() {
                 Please enter username and password registered with us
               </p>
             </div>
-            <form className="mt-8 space-y-6">
+            <form className="mt-8 space-y-6" action={formAction}>
               <div className="space-y-2">
                 <Label htmlFor="username" className="text-sm text-[#111]">
                   Username
@@ -73,6 +77,7 @@ export default function Home() {
                 <div className="relative">
                   <Input
                     id="username"
+                    name="username"
                     placeholder="Enter username"
                     className="h-12 rounded-2xl border-[#ededf0] bg-[#f9f9fb]"
                   />
@@ -86,6 +91,7 @@ export default function Home() {
                 <div className="relative">
                   <Input
                     id="password"
+                    name="password"
                     type={showPassword ? "text" : "password"}
                     placeholder="Enter password"
                     className="h-12 rounded-2xl border-[#ededf0] bg-[#f9f9fb] pr-12"
@@ -115,11 +121,16 @@ export default function Home() {
                 </button>
               </div>
 
-<Link href="/dashboard">
-  <Button className="h-12 w-full rounded-2xl bg-black text-base font-semibold text-white hover:bg-black/90">
-    Login
-  </Button>
-</Link>
+<Button
+  type="submit"
+  disabled={pending}
+  className="h-12 w-full rounded-2xl bg-black text-base font-semibold text-white hover:bg-black/90 disabled:opacity-60"
+>
+  {pending ? "Signing in..." : "Login"}
+</Button>
+              {state?.error ? (
+                <p className="text-sm font-semibold text-red-500">{state.error}</p>
+              ) : null}
               <p className="text-center text-xs text-[#6c6c6f]">
                 By clicking continue you agree to our{" "}
                 <span className="font-semibold text-black">Terms of Service</span>{" "}

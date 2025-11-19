@@ -1,10 +1,15 @@
-import { DataTable } from "@/components/data-table"
-import data from "./data.json"
+import { redirect } from "next/navigation"
 
-export default function Page() {
-  return (
-    <div className="px-2 sm:px-4 lg:px-6">
-      <DataTable data={data} />
-    </div>
-  )
+import { getCurrentUser } from "@/lib/auth"
+import { ROLE_HOME_PATH } from "@/lib/roles"
+
+export default async function DashboardPage() {
+  const user = await getCurrentUser()
+
+  if (!user) {
+    redirect("/")
+  }
+
+  const destination = ROLE_HOME_PATH[user.role.name] ?? ROLE_HOME_PATH.admin
+  redirect(destination)
 }

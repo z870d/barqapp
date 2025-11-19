@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { CheckIcon, XIcon } from "lucide-react"
+import { CheckIcon } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,

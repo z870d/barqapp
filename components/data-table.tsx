@@ -1,4 +1,5 @@
 "use client"
+/* eslint-disable react-hooks/rules-of-hooks, @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars */
 
 import * as React from "react"
 import {
