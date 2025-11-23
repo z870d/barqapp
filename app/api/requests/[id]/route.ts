@@ -90,14 +90,18 @@ export async function PATCH(
 
   const newStatus = action === "approve" ? "approved" : "rejected"
 
-  const updated = await prisma.request.update({
-    where: { id: requestId },
-    data: { status: newStatus },
-    include: {
-      maker: true,
-      shacker: true,
-    },
-  })
+const updated = await prisma.request.update({
+  where: { id: requestId },
+  data: {
+    status: newStatus,
+    shacker_id: user.id, // ← assign checker who performed the action
+  },
+  include: {
+    maker: true,
+    shacker: true,
+  },
+})
+
 
   console.log(`${logTag} request updated`, {
     id: updated.id,

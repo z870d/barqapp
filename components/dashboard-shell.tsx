@@ -5,7 +5,9 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import type { LucideIcon } from "lucide-react"
 import {
+  SettingsIcon,
   BellIcon,
+  LogOutIcon,
   ChevronDownIcon,
   CircleHelpIcon,
   FileTextIcon,
@@ -19,7 +21,13 @@ import {
 import { Button } from "@/components/ui/button"
 import { Can } from "@/components/Can"
 import { ROLE_HOME_PATH } from "@/lib/roles"
-
+import { useRouter } from "next/navigation"
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+} from "@/components/ui/dropdown-menu"
 type MenuItem = {
   label: string
   href: string
@@ -29,34 +37,40 @@ type MenuItem = {
 
 const MENU_BY_ROLE: Record<string, MenuItem[]> = {
   maker: [
+            {
+      label: "All Requests",
+      href: "/dashboard/req",
+      icon: FileTextIcon,
+      allow: "request:read",
+    },
     {
       label: "New Request",
-      href: `${ROLE_HOME_PATH.maker}#create-request`,
+      href: `${ROLE_HOME_PATH.maker}`,
       icon: PlusCircleIcon,
       allow: "request:create",
     },
-    {
-      label: "My Requests",
-      href: `${ROLE_HOME_PATH.maker}#my-requests`,
+  ],
+  chacker: [
+            {
+      label: "All Requests",
+      href: "/dashboard/req",
       icon: FileTextIcon,
       allow: "request:read",
     },
-  ],
-  chacker: [
     {
       label: "Current Requests",
       href: `${ROLE_HOME_PATH.chacker}#current`,
-      icon: FileTextIcon,
-      allow: "request:read",
-    },
-    {
-      label: "Request History",
-      href: `${ROLE_HOME_PATH.chacker}#history`,
       icon: HistoryIcon,
       allow: "request:read",
     },
   ],
   admin: [
+        {
+      label: "All Requests",
+      href: "/dashboard/req",
+      icon: FileTextIcon,
+      allow: "request:read",
+    },
     {
       label: "Requests",
       href: ROLE_HOME_PATH.admin,
@@ -105,12 +119,14 @@ export function DashboardShell({
   const pathname = usePathname()
   const menuItems = MENU_BY_ROLE[user.role] ?? MENU_BY_ROLE.maker
   const userInitials = initials(user.username)
-  const headingByRole: Record<string, string> = {
-    maker: "My requests",
-    chacker: "Checker console",
-    admin: "Requests overview",
-  }
+const headingByRole: Record<string, string> = {
+  maker: "My requests",
+  chacker: "Checker console",
+  admin: "Requests overview",
+}
+
   const heading = headingByRole[user.role] ?? "Dashboard"
+const router = useRouter()
 
   return (
     <div className="flex min-h-screen bg-[#f5f5f7] text-[#1c1d22]">
@@ -216,7 +232,9 @@ export function DashboardShell({
               </div>
             </div>
 
-            <h1 className="text-3xl font-semibold">{heading}</h1>
+<h1 className="text-3xl font-semibold">
+  {pathname === "/dashboard/req" ? "All Requests" : heading}
+</h1>
 
             <div className="hidden items-center gap-3 lg:flex">
               <Button
@@ -233,18 +251,57 @@ export function DashboardShell({
                 <BellIcon className="size-5" />
               </Button>
 
-              <div className="hidden items-center gap-4 pl-2 sm:flex lg:pl-4 xl:pl-6">
-                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#e6ecff] text-sm font-semibold text-[#2f3a8f]">
-                  {userInitials}
-                </div>
-                <div className="text-left">
-                  <p className="text-sm font-semibold leading-tight">
-                    {user.username}
-                  </p>
-                  <p className="text-xs text-[#7a7d88]">{user.role}</p>
-                </div>
-                <ChevronDownIcon className="size-4 text-[#a1a4af]" />
-              </div>
+
+<div className="hidden items-center gap-4 pl-2 sm:flex lg:pl-4 xl:pl-6">
+  <DropdownMenu>
+    <DropdownMenuTrigger asChild>
+      <div className="flex cursor-pointer items-center gap-2">
+        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#e6ecff] text-sm font-semibold text-[#2f3a8f]">
+          {userInitials}
+        </div>
+        <div className="text-left">
+          <p className="text-sm font-semibold leading-tight">
+            {user.username}
+          </p>
+          <p className="text-xs text-[#7a7d88]">{user.role}</p>
+        </div>
+        <ChevronDownIcon className="size-4 text-[#a1a4af]" />
+      </div>
+    </DropdownMenuTrigger>
+
+<DropdownMenuContent
+  align="end"
+  className="w-48 rounded-xl border bg-white shadow-lg"
+>
+  {/* Profile */}
+  <DropdownMenuItem className="cursor-pointer py-2 text-sm flex items-center gap-2">
+    <UserIcon className="size-4 text-[#4f535c]" />
+    <span>Profile</span>
+  </DropdownMenuItem>
+
+  {/* Settings */}
+  <DropdownMenuItem className="cursor-pointer py-2 text-sm flex items-center gap-2">
+    <SettingsIcon className="size-4 text-[#4f535c]" />
+    <span>Settings</span>
+  </DropdownMenuItem>
+
+
+
+  {/* Divider */}
+  <div className="my-2 h-px w-full bg-gray-200" />
+
+  {/* Logout */}
+  <DropdownMenuItem
+    className="cursor-pointer py-2 text-sm text-red-600 flex items-center gap-2 focus:text-red-700 focus:bg-red-50"
+    onClick={() => router.push("/")}
+  >
+    <LogOutIcon className="size-4 text-red-600" />
+    <span>Logout</span>
+  </DropdownMenuItem>
+</DropdownMenuContent>
+
+  </DropdownMenu>
+</div>
             </div>
           </header>
 

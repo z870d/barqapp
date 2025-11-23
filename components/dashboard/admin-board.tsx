@@ -26,7 +26,7 @@ export function AdminBoard({ requests }: { requests: RequestDto[] }) {
           <TableHeader>
             <TableRow>
               <TableHead>ID</TableHead>
-              <TableHead>Field</TableHead>
+              <TableHead>Details</TableHead>
               <TableHead>Status</TableHead>
               <TableHead>Maker</TableHead>
               <TableHead>Checker</TableHead>

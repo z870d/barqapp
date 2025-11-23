@@ -12,7 +12,7 @@ const requestInclude = {
     shacker: true,
   },
   orderBy: {
-    created_at: "desc",
+    id: "desc",
   },
 } as const
 
@@ -72,18 +72,19 @@ export async function POST(request: NextRequest) {
     orderBy: { id: "asc" },
   })
 
-  const newRequest = await prisma.request.create({
-    data: {
-      maker_id: user.id,
-      shacker_id: shacker?.id ?? null,
-      status: "pending",
-      field: body.field.trim(),
-    },
-    include: {
-      maker: true,
-      shacker: true,
-    },
-  })
+const newRequest = await prisma.request.create({
+  data: {
+    maker_id: user.id,
+    shacker_id: null, // ❗ No checker assigned yet
+    status: "pending",
+    field: body.field.trim(),
+  },
+  include: {
+    maker: true,
+    shacker: true,
+  },
+})
+
 
   return NextResponse.json(serializeRequest(newRequest), { status: 201 })
 }
